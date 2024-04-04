@@ -2,3 +2,8 @@
 .env
 venv/
 env/
+backend\product\__pycache__
+backend\product\migrations
+backend\cfehome\__pycache__
+backend\api\migrations
+backend\api\__pycache__
