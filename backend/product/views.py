@@ -1,12 +1,17 @@
-from rest_framework import generics,mixins
-
+from rest_framework import authentication, generics,mixins,permissions
+from api.mixins import ProductPermissionMixin
 from .models import Product
 from .serializers import ProductSerializer
+from api.authentication import TokenAuthentication
 
-class CreateListProductApiview(generics.ListCreateAPIView):
+class CreateListProductApiview(ProductPermissionMixin, generics.ListCreateAPIView):
     queryset=Product.objects.all()
     serializer_class=ProductSerializer
-
+    authentication_classes = [
+        authentication.SessionAuthentication,
+        TokenAuthentication
+    ]
+    
     def perform_create(self, serializer):
         title=serializer.validated_data.get('title')
         content=serializer.validated_data.get('content')
@@ -27,7 +32,7 @@ create_list_product_view=CreateListProductApiview.as_view()
 #             content=title
 #         serializer.save(content=content)
 
-class UpdateProductApiview(generics.UpdateAPIView):
+class UpdateProductApiview(ProductPermissionMixin, generics.UpdateAPIView):
     queryset=Product.objects.all()
     serializer_class=ProductSerializer
     def perform_update(self, serializer):
@@ -37,7 +42,7 @@ class UpdateProductApiview(generics.UpdateAPIView):
 
 update_product_view=UpdateProductApiview.as_view()
 
-class DeleteProductApiview(generics.DestroyAPIView):
+class DeleteProductApiview(ProductPermissionMixin, generics.DestroyAPIView):
     queryset=Product.objects.all()
     serializer_class=ProductSerializer
     
@@ -47,7 +52,7 @@ class DeleteProductApiview(generics.DestroyAPIView):
 
 delete_product_view=DeleteProductApiview.as_view()
 
-class ProductDetailApiView(generics.RetrieveAPIView):
+class ProductDetailApiView(ProductPermissionMixin, generics.RetrieveAPIView):
     queryset=Product.objects.all()
     serializer_class=ProductSerializer
     #lookup_field='pk'
