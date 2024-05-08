@@ -1,17 +1,27 @@
 from rest_framework import serializers
 from .models import Product
 from rest_framework.reverse import reverse
+from api.serializers import UserInlineSerializer
 from .validators import validate_title,uniqure_validator
-class ProductSerializer(serializers.ModelSerializer):
 
-    my_discount=serializers.SerializerMethodField(read_only=True)
+class ProductInLineSerializer(serializers.Serializer):
+        url=serializers.HyperlinkedIdentityField(view_name='product-detail',lookup_field='pk')
+        title=serializers.CharField(read_only=True)
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    user=UserInlineSerializer(read_only=True)
+    # my_discount=serializers.SerializerMethodField(read_only=True)
     edit_url= serializers.SerializerMethodField(read_only=True)
     url=serializers.HyperlinkedIdentityField(view_name='product-detail',lookup_field='pk')
     email=serializers.EmailField(write_only=True)
     title=serializers.CharField(validators=[validate_title,uniqure_validator])
+    # related_products=ProductInLineSerializer(source='user.product_set.all',many=True,read_only=True)
     class Meta:
         model=Product
         fields=[
+            'user',
+            # 'related_products',
             'email',
             'url',
             'edit_url',
@@ -20,7 +30,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'content',
             'price',
             'sale_price',
-            'my_discount',
+            # 'my_discount',
         ]
 
     # def validate_title(self,value):
@@ -40,7 +50,7 @@ class ProductSerializer(serializers.ModelSerializer):
             return ""
         return reverse('product-edit',kwargs={'pk':obj.pk},request=request)
     
-    def get_my_discount(self,obj):
-        if not isinstance(obj,Product):
-            return None
-        return obj.get_discount()
+    # def get_my_discount(self,obj):
+    #     if not isinstance(obj,Product):
+    #         return None
+    #     return obj.get_discount()

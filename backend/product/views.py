@@ -1,10 +1,10 @@
 from rest_framework import authentication, generics,mixins,permissions
-from api.mixins import ProductPermissionMixin
+from api.mixins import UserMixin,ProductPermissionMixin
 from .models import Product
 from .serializers import ProductSerializer
 from api.authentication import TokenAuthentication
 
-class CreateListProductApiview(ProductPermissionMixin, generics.ListCreateAPIView):
+class CreateListProductApiview(UserMixin, ProductPermissionMixin, generics.ListCreateAPIView):
     queryset=Product.objects.all()
     serializer_class=ProductSerializer
     authentication_classes = [
@@ -17,7 +17,11 @@ class CreateListProductApiview(ProductPermissionMixin, generics.ListCreateAPIVie
         content=serializer.validated_data.get('content')
         if content is None:
             content=title
-        serializer.save(content=content)
+        serializer.save(user=self.request.user,content=content)
+    
+    # def get_queryset(self):
+    #     user=self.request.user
+    #     return super().get_queryset().filter(user=user)
 
 create_list_product_view=CreateListProductApiview.as_view()
 

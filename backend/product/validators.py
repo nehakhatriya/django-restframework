@@ -8,4 +8,4 @@ def validate_title(value):
             raise serializers.ValidationError(f'{value} already exists')
         return value
 
-uniqure_validator=UniqueValidator(queryset=Product.objects.all())
+uniqure_validator=UniqueValidator(queryset=Product.objects.all(),lookup='iexact')
